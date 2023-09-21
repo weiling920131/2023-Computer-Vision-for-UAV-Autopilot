@@ -11,6 +11,6 @@ for i in range(x):
             new = sum(img[i, j])/3
             img[i, j] = [new, new, new]
 
-cv2.imwrite('./output/output1-1.png', img)
+cv2.imwrite('./output/1-1.png', img)
 cv2.imshow('img',img)
 cv2.waitKey(0)
