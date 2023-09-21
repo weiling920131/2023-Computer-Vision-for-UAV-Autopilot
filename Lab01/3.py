@@ -8,7 +8,7 @@ def bilinear(image, rate):
     x, y, _ = img.shape
     img = np.vstack([img,np.zeros([1, y, 3])])
     img = np.hstack([img,np.zeros([x + 1, 1, 3])])
-    new_img = np.zeros([x*rate, y*rate, 3], dtype=int)
+    new_img = np.zeros([x*rate, y*rate, 3], dtype=np.uint8)
     for i in range(x*rate):
         for j in range(y*rate):
             x1 = math.floor(i/rate)
@@ -21,7 +21,6 @@ def bilinear(image, rate):
 
             new_img[i, j] = top*(x2 - i/rate) + bottom*(i/rate - x1) 
 
-    new_img = new_img.astype(np.uint8)
     cv2.imwrite('./output/3.png', new_img)
     cv2.imshow('img',new_img)
     cv2.waitKey(0)
