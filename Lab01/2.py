@@ -11,5 +11,5 @@ for i in range(x*3):
         
         new_img[i, j] = img[a, b]
 cv2.imwrite('./output/2.png', new_img)
-cv2.imshow('new_img',new_img)
-cv2.waitKey(0)
+# cv2.imshow('new_img',new_img)
+# cv2.waitKey(0)

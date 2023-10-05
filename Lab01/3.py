@@ -22,8 +22,8 @@ def bilinear(image, rate):
             new_img[i, j] = top*(x2 - i/rate) + bottom*(i/rate - x1) 
 
     cv2.imwrite('./output/3.png', new_img)
-    cv2.imshow('img',new_img)
-    cv2.waitKey(0)
+    # cv2.imshow('img',new_img)
+    # cv2.waitKey(0)
 
 
 if __name__ == '__main__':
