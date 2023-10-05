@@ -9,10 +9,7 @@ def make_histogram(img, mode=256):
     for i in range(h):
         for j in range(w):
             histogram[img[i][j]] += 1
-    # trans = np.zeros(mode)
-    # for i in range(mode):
-    #     trans[i] = (mode-1)  * sum(histogram[0:i+1])/(h*w)
-
+            
     return histogram
 
 def find_min_threshold(histogram):
