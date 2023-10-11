@@ -3,19 +3,26 @@ import numpy as np
 import os
 
 def select_object(frame, threshold, resolve, areas, cc_mask):
+    h, w, _ = frame.shape
     frame = np.array(frame, dtype=np.int32)
     for set in resolve:
         area = 0
         for label in set:
             area += areas[label]
         
-        if area > threshold and area < 10000:
-            x_array, y_array = np.where(np.isin(cc_mask, np.array(list(set)))) ##notice
-            # print('\n\n')
-            # print(x_array)
-            # print(y_array)
-            # print('\n\n')
-            cv2.rectangle(frame, (x_array[0], y_array[0]), (int(x_array[0]+area**0.52), int(y_array[0]+area**0.48)), (0, 255, 0), 2)
+        if area > threshold:
+            right = 0
+            left = w
+            top = 0
+            bottom = h
+            for i in range(h):
+                for j in range(w):
+                    if cc_mask[i][j] in set:
+                        right = max(right, j)
+                        left = min(left, j)
+                        top = max(top, i)
+                        bottom = min(bottom, i)
+            cv2.rectangle(frame, (right, top), (left, bottom), (0, 255, 0), 2)
             
     np.clip(frame, 0, 255, out=frame)
     frame = np.array(frame, dtype=np.uint8)
@@ -37,16 +44,16 @@ def connected_component(nmask):
             if not i and not j:
                 new_mask[i][j] = 1
                 areas[1] = 1
-            elif not i:
-                if nmask[i][j-1] != 0:
+            elif not i and j:
+                if new_mask[i][j-1] != 0:
                     new_mask[i][j] = new_mask[i][j-1]
                     areas[new_mask[i][j]] += 1
                 else:
                     new_mask[i][j] = unused
                     areas[unused] = 1
                     unused += 1
-            elif not j:
-                if nmask[i-1][j] != 0:
+            elif not j and i:
+                if new_mask[i-1][j] != 0:
                     new_mask[i][j] = new_mask[i-1][j]
                     areas[new_mask[i][j]] += 1
                 else:
@@ -54,7 +61,7 @@ def connected_component(nmask):
                     areas[unused] = 1
                     unused += 1
             else:
-                if nmask[i-1][j] != 0 and nmask[i][j-1] != 0:
+                if new_mask[i-1][j] != 0 and new_mask[i][j-1] != 0:
                     new_mask[i][j] = min(new_mask[i-1][j], new_mask[i][j-1])
                     areas[new_mask[i][j]] += 1
                     check = True
@@ -66,10 +73,10 @@ def connected_component(nmask):
                     if check:
                         resolve.append({new_mask[i-1][j], new_mask[i][j-1]})
 
-                elif nmask[i-1][j] != 0:
+                elif new_mask[i-1][j] != 0:
                     new_mask[i][j] = new_mask[i-1][j]
                     areas[new_mask[i][j]] += 1
-                elif nmask[i][j-1] != 0:
+                elif new_mask[i][j-1] != 0:
                     new_mask[i][j] = new_mask[i][j-1]
                     areas[new_mask[i][j]] += 1
                 else:
@@ -99,13 +106,14 @@ def solve(video, threshold):
         resolve, areas, cc_mask = connected_component(nmask)
         # np.set_printoptions(threshold=np.inf)
         # print(cc_mask)
-        selected_frame = select_object(cc_mask, threshold, resolve, areas, cc_mask)
+        selected_frame = select_object(frame, threshold, resolve, areas, cc_mask)
 
         cv2.imshow("frame", selected_frame)
 
         # cv2.circle(frame, (50, 50), 10, (255,0,0), 5)
         # cv2.circle(frame, (200, 200), 10, (0,255,0), 5)
         # cv2.imshow("frame", frame)
+
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
@@ -125,7 +133,7 @@ if __name__ == '__main__':
     # ret, frame = video.read()
     # cv2.imwrite('input/3.jpg', frame)
 
-    solve(video, threshold=1000)
+    solve(video, threshold=700)
     # test = np.array([[0,0,0,0,0,255,255,255,0,0],
     #                  [255,255,255,0,0,255,255,0,0,0],
     #                  [255,0,0,255,255,0,0,0,255,255],
