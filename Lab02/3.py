@@ -29,6 +29,7 @@ def find_min_threshold(histogram):
         
         var_low = np.var(np.array(lower))
         var_lar = np.var(np.array(larger))
+        print(var_low + var_lar)
         if Min >= var_low + var_lar:
             Min = var_lar + var_low
             min_threshold = threshold
@@ -43,7 +44,7 @@ if __name__ == '__main__':
     histogram = make_histogram(img)
     min_threshold = find_min_threshold(histogram)
 
-    print(min_threshold)
+    # print(histogram)
     for i in range(h):
         for j in range(w):
             img[i][j] = 0 if img[i][j] <= min_threshold else 255
