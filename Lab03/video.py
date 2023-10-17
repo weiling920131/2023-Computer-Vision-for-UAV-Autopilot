@@ -120,6 +120,8 @@ def connected_component(nmask):
 
 def solve(video, threshold):
     backSub = cv2.createBackgroundSubtractorMOG2()
+    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+    out = cv2.VideoWriter('output/output.mp4', fourcc, 20.0, (320, 240))
     while True:
         ret, frame = video.read()
         if not ret:
@@ -137,13 +139,15 @@ def solve(video, threshold):
             selected_frame = select_object(frame, threshold, resolve, areas, cc_mask)
         else:
             selected_frame = frame
-        cv2.imshow("frame", selected_frame)
-        if cv2.waitKey(33) & 0xFF == ord(']'):
-            break
+        out.write(selected_frame)
+        # cv2.imshow("frame", selected_frame)
+        # if cv2.waitKey(33) & 0xFF == ord(']'):
+        #     break
 
 if __name__ == '__main__':
 
     video = cv2.VideoCapture('input/train.mp4')
+    
     if not video.isOpened():
         print('error : The video is not found.')
         exit(1)
