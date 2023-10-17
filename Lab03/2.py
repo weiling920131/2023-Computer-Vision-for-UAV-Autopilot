@@ -66,8 +66,8 @@ while cap.isOpened():
             cv2.rectangle(frame, (w1, h1), (w2, h2), (0, 0, 255), 3, cv2.LINE_AA)
     
     out.write(frame)
-    # cv2.imshow("frame", frame)
-    # cv2.waitKey(33)
+    cv2.imshow("frame", frame)
+    cv2.waitKey(33)
 
 cap.release()
 out.release()
