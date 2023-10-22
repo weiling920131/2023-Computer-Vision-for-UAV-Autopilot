@@ -1,44 +1,41 @@
 import cv2
 import numpy as np
 
-# patternSize = (9, 6)
-# objectPoints = []
-# for i in range(9):
-#     for j in range(6):
-#         objectPoints += [[i, j, 0]]
-# objectPoints = np.array([objectPoints] * 20, dtype=np.float32)
-# print(objectPoints.shape)
-
-# imagePoints = []
-
 img = cv2.imread('images/screen.jpg')
-cap = cv2.VideoCapture(1)
+img_corner = np.float32([[276, 190], [618, 86], [263, 402], [627, 370]])
+
+cap = cv2.VideoCapture(0)
 while True:
     ret, frame = cap.read()
-    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-    h, w = frame.shape
-    imageSize = (w, h)
+    h, w, _ = frame.shape
+    cap_corner = np.float32([[0, 0], [w, 0], [0, h], [w, h]])
 
-    ret, corner = cv2.findChessboardCorners(frame, patternSize, None)
-    if ret:
-        corner = cv2.cornerSubPix(frame, corner, (11, 11), (-1, -1),  (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.1))
-        corner = corner.T.reshape(-1, 2)
-        imagePoints.append(corner)
-        # print(corner.shape)
-        if len(corner) >= 20:
-            break
+    frame_padding = np.zeros((h + 1, w + 1, 3), np.uint8)
+    frame_padding[0:h, 0:w] = frame
 
-    cv2.imshow('frame', frame)
-    cv2.waitKey(33)
+    proj = cv2.getPerspectiveTransform(img_corner, cap_corner)
+    new_img = img.copy()
 
-imagePoints = np.array(imagePoints)
-print(imagePoints.shape)
+    for y in range(86, 402+1):
+        for x in range(263, 627+1):
+            loc = np.matmul(proj, [x, y, 1])
+            loc /= loc[2]
+            loc = [int(loc[0]), int(loc[1])]  # cap [x, y]
+            
+            if 0 <= loc[0] < w and 0 <= loc[1] < h:
+                x1 = loc[0]
+                x2 = x1 + 1
+                y1 = loc[1]
+                y2 = y1 + 1
 
-# ret, cameraMatrix, distCoeffs, rvecs, tvecs = cv2.calibrateCamera(objectPoints, corner, imageSize, None, None)
-# # print(cameraMatrix, distCoeffs, rvecs, tvecs)
-# f = cv2.FileStorage('output/1.xml', cv2.FILE_STORAGE_WRITE)
-# f.write("intrinsic", cameraMatrix)
-# f.write("distortion", distCoeffs)
-# f.release()
-cv2.getPerspectiveTransform(cap_corner, img_corner)
+                A = frame_padding[y1, x1] * (x2 - loc[0]) + frame_padding[y1, x2] * (loc[0] - x1)
+                B = frame_padding[y2, x1] * (x2 - loc[0]) + frame_padding[y2, x2] * (loc[0] - x1)
+                new_img[y, x] = A * (y2 - loc[1]) + B * (loc[1] - y1)
+                
+    cv2.imshow('new img', new_img)
+    key = cv2.waitKey(33)
+    if key == ord('q'):
+        break
+
+cv2.destroyAllWindows()
