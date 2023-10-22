@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 img = cv2.imread('images/screen.jpg')
-img_corner = np.float32([[276, 190], [618, 86], [263, 402], [627, 370]])
+img_corner = np.float32([[276, 189], [618, 86], [263, 402], [627, 370]])
 
 cap = cv2.VideoCapture(0)
 while True:
@@ -17,16 +17,15 @@ while True:
     proj = cv2.getPerspectiveTransform(img_corner, cap_corner)
     new_img = img.copy()
 
-    for y in range(86, 402+1):
-        for x in range(263, 627+1):
+    for y in range(int(min(img_corner.T[1])), int(max(img_corner.T[1]) + 1)):
+        for x in range(int(min(img_corner.T[0])), int(max(img_corner.T[0]) + 1)):
             loc = np.matmul(proj, [x, y, 1])
-            loc /= loc[2]
-            loc = [int(loc[0]), int(loc[1])]  # cap [x, y]
-            
-            if 0 <= loc[0] < w and 0 <= loc[1] < h:
-                x1 = loc[0]
+            loc = loc[:2] / loc[2]  # cap [x, y]
+
+            x1 = int(np.floor(loc[0]))
+            y1 = int(np.floor(loc[1]))
+            if 0 <= x1 < w and 0 <= y1 < h:
                 x2 = x1 + 1
-                y1 = loc[1]
                 y2 = y1 + 1
 
                 A = frame_padding[y1, x1] * (x2 - loc[0]) + frame_padding[y1, x2] * (loc[0] - x1)
