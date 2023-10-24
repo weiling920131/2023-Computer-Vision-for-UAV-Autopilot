@@ -18,7 +18,7 @@ def main():
     for i in range(9):
         for j in range(6):
             objectPoints += [[i, j, 0]]
-    objectPoints = np.array([objectPoints] * 20, dtype=np.float32)
+    objectPoints = np.array([objectPoints] * 10, dtype=np.float32)
     print(objectPoints.shape)
 
     imagePoints = []
@@ -37,11 +37,11 @@ def main():
             corner = corner.T.reshape(-1, 2)
             imagePoints.append(corner)
             # print(corner.shape)
-            if len(imagePoints) >= 20:
+            if len(imagePoints) >= 10:
                 break
         
         cv2.imshow("drone", frame)
-        key = cv2.waitKey(33)
+        key = cv2.waitKey(500)
     
     imagePoints = np.array(imagePoints)
     print(imagePoints.shape)

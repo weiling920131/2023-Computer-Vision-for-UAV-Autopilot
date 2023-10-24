@@ -32,7 +32,7 @@ def main():
             print(tvec, '\n')
 
             # for i in range(len(markerIds)):
-            frame = cv2.aruco.drawAxis(frame, intrinsic, distortion, rvec[0], tvec[0], 10)
+            frame = cv2.aruco.drawAxis(frame, intrinsic, distortion, rvec[0], tvec[0], 0.1)
             text = "x:" + str(tvec[0, 0, 0]) + " y:" + str(tvec[0, 0, 1]) + " z: " + str(tvec[0, 0, 2])
             cv2.putText(frame, text, (0, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 1, cv2.LINE_AA)
         
