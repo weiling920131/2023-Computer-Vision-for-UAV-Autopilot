@@ -26,7 +26,7 @@ def main():
     dictionary = cv2.aruco.Dictionary_get(cv2.aruco.DICT_6X6_250)
     parameters = cv2.aruco.DetectorParameters_create()
 
-    fs = cv2.FileStorage("calibrateCamera2.xml", cv2.FILE_STORAGE_READ)
+    fs = cv2.FileStorage("calibrateCamera.xml", cv2.FILE_STORAGE_READ)
     intrinsic = fs.getNode("intrinsic").mat()
     distortion = fs.getNode("distortion").mat()
     fs.release()
@@ -39,7 +39,7 @@ def main():
     y_pid.initialize()
     yaw_pid.initialize()
 
-
+    flag = 1
     while True:
         key = cv2.waitKey(1)
         if key != -1:
@@ -56,7 +56,13 @@ def main():
                 rvec, tvec, _objPoints = cv2.aruco.estimatePoseSingleMarkers(markerCorners, 15, intrinsic, distortion)
 
                 for i in range(len(markerIds)):
-                    if markerIds[i][0] != 0:
+                    id = markerIds[i][0]
+                    if id == 1:
+                        flag = False
+                    elif id ==2:
+                        flag = 3
+
+                    elif id != 0:
                         continue
                     # print(rvec[i])
                     # print(tvec, '\n')
@@ -87,7 +93,10 @@ def main():
                     text = " z: " + str(tvec[0, 0, 2])
                     cv2.putText(frame, text, (0, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 1, cv2.LINE_AA)
             else:
-                drone.send_rc_control(0, 0, 0, 0)
+                if flag == 2:
+                    drone.send_rc_control(0, -50, 0 , 0)
+                else:
+                    drone.send_rc_control(0, 0, 0, 0)
         
         cv2.imshow("drone", frame)
     
