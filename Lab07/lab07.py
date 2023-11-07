@@ -7,7 +7,7 @@ from pyimagesearch.pid import PID
 from keyboard_djitellopy import keyboard
 
 
-def mss(update, max_speed_threshold=30):
+def mss(update, max_speed_threshold=50):
     if update > max_speed_threshold:
         update = max_speed_threshold
     elif update < -max_speed_threshold:
@@ -26,9 +26,10 @@ def main():
     dictionary = cv2.aruco.Dictionary_get(cv2.aruco.DICT_6X6_250)
     parameters = cv2.aruco.DetectorParameters_create()
 
-    fs = cv2.FileStorage("calibrateCamera.xml", cv2.FILE_STORAGE_READ)
+    fs = cv2.FileStorage("calibrateCamera2.xml", cv2.FILE_STORAGE_READ)
     intrinsic = fs.getNode("intrinsic").mat()
     distortion = fs.getNode("distortion").mat()
+    fs.release()
 
     z_pid = PID(kP=0.7, kI=0.0001, kD=0.1)
     y_pid = PID(kP=0.7, kI=0.0001, kD=0.1)
