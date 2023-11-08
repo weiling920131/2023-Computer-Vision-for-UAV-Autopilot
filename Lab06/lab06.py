@@ -1,11 +1,19 @@
-import keyboard
 import cv2
 import numpy as np
 import time
-import tello
 import math
 from djitellopy import Tello
 from pyimagesearch.pid import PID
+from keyboard_djitellopy import keyboard
+
+
+def mss(update, max_speed_threshold=30):
+    if update > max_speed_threshold:
+        update = max_speed_threshold
+    elif update < -max_speed_threshold:
+        update = -max_speed_threshold
+
+    return update
 
 def main():
     # Tello
@@ -88,4 +96,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
