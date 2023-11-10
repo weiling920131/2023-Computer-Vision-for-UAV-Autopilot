@@ -126,7 +126,7 @@ def main():
                         break
 
                     elif id == 0:
-                        z_update = tvec[i, 0, 2] -  100
+                        z_update = tvec[i, 0, 2] -  50
                         z_update = z_pid.update(z_update, sleep=0)
                         y_update = -(tvec[i, 0, 1])
                         y_update = y_pid.update(y_update, sleep=0)
