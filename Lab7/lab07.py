@@ -7,7 +7,7 @@ from pyimagesearch.pid import PID
 from keyboard_djitellopy import keyboard
 
 
-def mss(update, max_speed_threshold=30):
+def mss(update, max_speed_threshold=50):
     if update > max_speed_threshold:
         update = max_speed_threshold
     elif update < -max_speed_threshold:
@@ -30,19 +30,25 @@ def main():
     intrinsic = fs.getNode("intrinsic").mat()
     distortion = fs.getNode("distortion").mat()
     fs.release()
-    
+
     z_pid = PID(kP=0.7, kI=0.0001, kD=0.1)
     y_pid = PID(kP=0.7, kI=0.0001, kD=0.1)
+    x_pid = PID(kP=0.7, kI=0.0001, kD=0.1)
     yaw_pid = PID(kP=0.7, kI=0.0001, kD=0.1)
 
     z_pid.initialize()
     y_pid.initialize()
+    x_pid.initialize()
     yaw_pid.initialize()
 
     flag = 1
     while True:
+        # print(flag)
+
         key = cv2.waitKey(1)
         if key != -1:
+            if key == ord('q'):
+                break
             keyboard(drone, key)
         else:
             frame = frame_read.frame
@@ -54,68 +60,184 @@ def main():
                 rvec, tvec, _objPoints = cv2.aruco.estimatePoseSingleMarkers(markerCorners, 15, intrinsic, distortion)
 
                 for i in range(len(markerIds)):
-                    if markerIds[i][0] == 0:
-                        # print(rvec[i])
-                        # print(tvec, '\n')
-                        z_update = tvec[i, 0, 2] - 100
-                        # print("org_z: ", str(z_update))
-                        z_update = z_pid.update(z_update, sleep=0)
-                        # print("pid_z: ", str(z_update))
-                        y_update = -(tvec[i, 0, 1] + 20)
-                        # print("org_z: ", str(z_update))
-                        y_update = y_pid.update(y_update, sleep=0)
-                        # print("pid_z: ", str(z_update))
-                        R, _ = cv2.Rodrigues(rvec[i])
-                        V = np.matmul(R, [0, 0, 1])
-                        rad = math.atan(V[0]/V[2])
-                        deg = rad / math.pi * 180
-                        print(deg)
-                        yaw_update = yaw_pid.update(deg, sleep=0)
-                        
-                    elif markerIds[i][0] == 1:
+                    id = markerIds[i][0]
+                    if id == 1:
                         # when id1 img < 150，then  
-                        z_update = tvec[i, 0, 2] - 75
-                        # print("org_z: ", str(z_update))
-                        z_update = z_pid.update(z_update, sleep=0)
-                        # print("pid_z: ", str(z_update))
+                        z_update = tvec[i, 0, 2] - 60
                         y_update = -(tvec[i, 0, 1] + 20)
-                        # print("org_z: ", str(z_update))
+                        # x_update = tvec[i, 0, 0]
+                        z_update = z_pid.update(z_update, sleep=0)
                         y_update = y_pid.update(y_update, sleep=0)
-                        # print("pid_z: ", str(z_update))
+                        # x_update = x_pid.update(x_update, sleep=0)
+
                         R, _ = cv2.Rodrigues(rvec[i])
                         V = np.matmul(R, [0, 0, 1])
                         rad = math.atan(V[0]/V[2])
                         deg = rad / math.pi * 180
-                        print(deg)
                         yaw_update = yaw_pid.update(deg, sleep=0)
-                        if abs(z_update) <= 15:
-                            drone.send_rc_control(0, 0, 80, 0)
-                            sleep(2)
-                            drone.send_rc_control(0, 50, 0, 0)
-                            sleep(1)
+
+                        if abs(z_update) <= 15 and abs(yaw_update) <= 5:
+                            drone.send_rc_control(0, 0, 50, 0)
+                            time.sleep(2)
+                            drone.send_rc_control(0, 40, 0, 0)
+                            time.sleep(1.2)
+                            # drone.send_rc_control(0, 0, -50, 0)
+                            # time.sleep(2)
                             flag = 2
-                            break
-                    #elif markerIds[i][0] == 2:
-                        
-                    z_update = mss(z_update)
-                    y_update = mss(y_update)
-                    yaw_update = mss(yaw_update)
-                    print(z_update, y_update, yaw_update)
 
-                    drone.send_rc_control(0, int(z_update//2), int(y_update), int(yaw_update))
+                        else:
+                            z_update = int(mss(z_update) // 2)
+                            y_update = int(mss(y_update))
+                            x_update = 0
+                            yaw_update = int(mss(yaw_update))
+                            drone.send_rc_control(x_update, z_update, y_update, yaw_update)
 
-                    frame = cv2.aruco.drawAxis(frame, intrinsic, distortion, rvec[0], tvec[0], 0.1)
-                    text = " z: " + str(tvec[0, 0, 2])
-                    cv2.putText(frame, text, (0, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 1, cv2.LINE_AA)
+                        break
+
+                    elif id == 2:
+                        z_update = tvec[i, 0, 2] - 50
+                        y_update = -(tvec[i, 0, 1] + 20)
+                        x_update = tvec[i, 0, 0]
+                        z_update = z_pid.update(z_update, sleep=0)
+                        y_update = y_pid.update(y_update, sleep=0)
+                        x_update = x_pid.update(x_update, sleep=0)
+
+                        R, _ = cv2.Rodrigues(rvec[i])
+                        V = np.matmul(R, [0, 0, 1])
+                        rad = math.atan(V[0]/V[2])
+                        deg = rad / math.pi * 180
+                        yaw_update = yaw_pid.update(deg, sleep=0)
+                        flag = 3
+
+                        if abs(z_update) <= 10 and abs(yaw_update) <= 5:
+                            drone.send_rc_control(0, 0, -50, 0)
+                            time.sleep(1.5)
+                            drone.send_rc_control(0, 60, 0, 0)
+                            time.sleep(2.0)
+                            drone.send_rc_control(0, 0, 50, 0)
+                            time.sleep(1.0)
+                            
+                            # drone.land()
+
+                        else:
+                            z_update = int(mss(z_update) // 2)
+                            y_update = int(mss(y_update))
+                            x_update = int(mss(x_update))
+                            yaw_update = int(mss(yaw_update))
+
+                            drone.send_rc_control(x_update, z_update, y_update, yaw_update)
+                            # print(0, int(z_update//2), int(y_update), int(yaw_update))
+
+                        break
+
+                    elif id == 0:
+                        z_update = tvec[i, 0, 2] -  50
+                        z_update = z_pid.update(z_update, sleep=0)
+                        y_update = -(tvec[i, 0, 1])
+                        y_update = y_pid.update(y_update, sleep=0)
+                        R, _ = cv2.Rodrigues(rvec[i])
+                        V = np.matmul(R, [0, 0, 1])
+                        rad = math.atan(V[0]/V[2])
+                        deg = rad / math.pi * 180
+                        yaw_update = yaw_pid.update(deg, sleep=0)
+
+                        z_update = int(mss(z_update) // 2)
+                        y_update = int(mss(y_update*1.2))
+                        x_update = 0
+                        yaw_update = int(mss(yaw_update))
+
+                        drone.send_rc_control(x_update, z_update, y_update, yaw_update)
+
+                    elif id == 3 and flag == 3:
+                        z_update = tvec[i, 0, 2] - 50
+                        z_update = z_pid.update(z_update, sleep=0)
+                        y_update = -(tvec[i, 0, 1] + 20)
+                        y_update = y_pid.update(y_update, sleep=0)
+                        x_update = tvec[i,0,0]
+                        x_update = x_pid.update(x_update, sleep=0)
+                        R, _ = cv2.Rodrigues(rvec[i])
+                        V = np.matmul(R, [0, 0, 1])
+                        rad = math.atan(V[0]/V[2])
+                        deg = rad / math.pi * 180
+                        yaw_update = yaw_pid.update(deg, sleep=0)
+
+                        if abs(z_update) <= 5 and abs(yaw_update) <= 5:
+                            flag = 4
+                        else:
+                            z_update = int(mss(z_update) // 2)
+                            y_update = int(mss(y_update))
+                            x_update = int(mss(x_update))
+                            yaw_update = int(mss(yaw_update))
+
+                            drone.send_rc_control(x_update, z_update, y_update, yaw_update)
+                    elif id == 4 and flag == 4:
+                        z_update = tvec[i, 0, 2] - 75
+                        z_update = z_pid.update(z_update, sleep=0)
+                        y_update = -(tvec[i, 0, 1] + 20)
+                        y_update = y_pid.update(y_update, sleep=0)
+
+                        x_update = tvec[i, 0, 0]
+                        x_update = x_pid.update(x_update, sleep=0)
+
+                        R, _ = cv2.Rodrigues(rvec[i])
+                        V = np.matmul(R, [0, 0, 1])
+                        rad = math.atan(V[0]/V[2])
+                        deg = rad / math.pi * 180
+                        yaw_update = yaw_pid.update(deg, sleep=0)
+
+                        if abs(z_update) <= 5 and abs(yaw_update) <= 5:
+                            flag = 5
+                        else:
+                            z_update = int(mss(z_update) // 2)
+                            y_update = int(mss(y_update))
+                            x_update = int(mss(x_update))
+                            yaw_update = int(mss(yaw_update))
+
+                            drone.send_rc_control(x_update, z_update, y_update, yaw_update)
+                    elif id == 5 and flag ==5:
+                        z_update = tvec[i, 0, 2] - 150
+                        z_update = z_pid.update(z_update, sleep=0)
+                        y_update = -(tvec[i, 0, 1] + 20)
+                        y_update = y_pid.update(y_update, sleep=0)
+
+                        x_update = tvec[i, 0, 0]
+                        x_update = x_pid.update(x_update, sleep=0)
+
+                        R, _ = cv2.Rodrigues(rvec[i])
+                        V = np.matmul(R, [0, 0, 1])
+                        rad = math.atan(V[0]/V[2])
+                        deg = rad / math.pi * 180
+                        yaw_update = yaw_pid.update(deg, sleep=0)
+
+                        if abs(z_update) <= 5 and abs(yaw_update) <= 5 and abs(x_update) <= 5:
+                            flag = 6
+                        else:
+                            z_update = int(mss(z_update) // 2)
+                            y_update = int(mss(y_update))
+                            x_update = int(mss(x_update))
+                            yaw_update = int(mss(yaw_update))
+
+                            drone.send_rc_control(x_update, z_update, y_update, yaw_update)
+                    else:
+                        if flag == 4:
+                            drone.send_rc_control(0, 0, 0, 30)
+                        elif flag == 5:
+                            drone.send_rc_control(-50, -3, 0, 0)
+                        elif flag == 6:
+                            drone.send_rc_control(0, 0, -30, 0)
+
             else:
-                # doing task 1 
                 if flag == 2:
-                    sleep(1)
-                #if flag == 3:
-                    
+                    drone.send_rc_control(0, 0, -30, 0)
+                elif flag == 4:
+                    drone.send_rc_control(0, 0, 0, 30)
+                elif flag == 5:
+                    drone.send_rc_control(-50, 0, 0, 0)
+                elif flag == 6:
+                    drone.send_rc_control(0, 0, -60, 0)
                 else:
                     drone.send_rc_control(0, 0, 0, 0)
-            
+        
         cv2.imshow("drone", frame)
     
     #cv2.destroyAllWindows()
@@ -124,4 +246,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
