@@ -6,6 +6,9 @@ from djitellopy import Tello
 from pyimagesearch.pid import PID
 
 def main():
+    
+    yaw_pid = PID(kP=0.7, kI=0.0001, kD=0.1)
+    yaw_pid.initialize()
     # Tello
     drone = Tello()
     drone.connect()
@@ -28,12 +31,19 @@ def main():
         if markerIds is not None:
             frame = cv2.aruco.drawDetectedMarkers(frame, markerCorners, markerIds)
             rvec, tvec, _objPoints = cv2.aruco.estimatePoseSingleMarkers(markerCorners, 15, intrinsic, distortion)
-            print(rvec)
-            print(tvec, '\n')
+            # print(rvec)
+            # print(tvec, '\n')
 
             # for i in range(len(markerIds)):
             frame = cv2.aruco.drawAxis(frame, intrinsic, distortion, rvec[0], tvec[0], 0.1)
             text = "x:" + str(tvec[0, 0, 0]) + " y:" + str(tvec[0, 0, 1]) + " z: " + str(tvec[0, 0, 2])
+            R, _ = cv2.Rodrigues(rvec[0])
+            V = np.matmul(R, [0, 0, 1])
+            rad = math.atan(V[0]/V[2])
+            deg = rad / math.pi * 180
+            yaw_update = yaw_pid.update(deg, sleep=0)
+            print("Degree: ", deg)
+            print("yaw_update: ", yaw_update)
             cv2.putText(frame, text, (0, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 1, cv2.LINE_AA)
         
         cv2.imshow("drone", frame)

@@ -43,7 +43,7 @@ def main():
 
     flag = 1
     while True:
-        # print(flag)
+        print(flag)
 
         key = cv2.waitKey(1)
         if key != -1:
@@ -65,10 +65,10 @@ def main():
                         # when id1 img < 150，then  
                         z_update = tvec[i, 0, 2] - 60
                         y_update = -(tvec[i, 0, 1] + 20)
-                        # x_update = tvec[i, 0, 0]
+                        x_update = tvec[i, 0, 0]
                         z_update = z_pid.update(z_update, sleep=0)
                         y_update = y_pid.update(y_update, sleep=0)
-                        # x_update = x_pid.update(x_update, sleep=0)
+                        x_update = x_pid.update(x_update, sleep=0)
 
                         R, _ = cv2.Rodrigues(rvec[i])
                         V = np.matmul(R, [0, 0, 1])
@@ -77,18 +77,18 @@ def main():
                         yaw_update = yaw_pid.update(deg, sleep=0)
 
                         if abs(z_update) <= 15 and abs(yaw_update) <= 5:
-                            drone.send_rc_control(0, 0, 50, 0)
-                            time.sleep(2)
-                            drone.send_rc_control(0, 40, 0, 0)
-                            time.sleep(1.2)
-                            # drone.send_rc_control(0, 0, -50, 0)
-                            # time.sleep(2)
+                            drone.send_rc_control(0, 0, 60, 0)
+                            time.sleep(float(5/3))
+                            drone.send_rc_control(0, 48, 0, 0)
+                            time.sleep(1.0)
+                            drone.send_rc_control(0, 0, -60, 0)
+                            time.sleep(float(5/3))
                             flag = 2
 
                         else:
                             z_update = int(mss(z_update) // 2)
                             y_update = int(mss(y_update))
-                            x_update = 0
+                            x_update = int(mss(x_update))
                             yaw_update = int(mss(yaw_update))
                             drone.send_rc_control(x_update, z_update, y_update, yaw_update)
 
@@ -109,7 +109,7 @@ def main():
                         yaw_update = yaw_pid.update(deg, sleep=0)
                         flag = 3
 
-                        if abs(z_update) <= 10 and abs(yaw_update) <= 5:
+                        if abs(z_update) <= 10 and abs(yaw_update) <= 10:
                             drone.send_rc_control(0, 0, -50, 0)
                             time.sleep(1.5)
                             drone.send_rc_control(0, 60, 0, 0)
@@ -131,7 +131,8 @@ def main():
                         break
 
                     elif id == 0:
-                        z_update = tvec[i, 0, 2] -  50
+                        flag = 3
+                        z_update = tvec[i, 0, 2] -  40
                         z_update = z_pid.update(z_update, sleep=0)
                         y_update = -(tvec[i, 0, 1])
                         y_update = y_pid.update(y_update, sleep=0)
@@ -143,34 +144,38 @@ def main():
 
                         z_update = int(mss(z_update) // 2)
                         y_update = int(mss(y_update*1.2))
-                        x_update = 0
+                        # x_update = 0
                         yaw_update = int(mss(yaw_update))
 
-                        drone.send_rc_control(x_update, z_update, y_update, yaw_update)
+                        drone.send_rc_control(0, z_update, y_update, yaw_update)
+                        break
 
-                    elif id == 3 and flag==3: ##remember to check
-                        z_update = tvec[i, 0, 2] - 50
+                    elif id == 3 and flag == 3:
+                        z_update = tvec[i, 0, 2] - 70
                         z_update = z_pid.update(z_update, sleep=0)
                         y_update = -(tvec[i, 0, 1] + 20)
                         y_update = y_pid.update(y_update, sleep=0)
-                        x_update = tvec[i,0,0]
-                        x_update = x_pid.update(x_update, sleep=0)
+                        # x_update = tvec[i, 0, 0]
+                        # x_update = x_pid.update(x_update, sleep=0)
                         R, _ = cv2.Rodrigues(rvec[i])
                         V = np.matmul(R, [0, 0, 1])
                         rad = math.atan(V[0]/V[2])
                         deg = rad / math.pi * 180
                         yaw_update = yaw_pid.update(deg, sleep=0)
 
-                        if abs(z_update) <= 10:
+                        if abs(z_update) <= 10 and abs(yaw_update) <= 10:
                             drone.rotate_clockwise(90)
                             flag = 4
                         else:
                             z_update = int(mss(z_update) // 2)
                             y_update = int(mss(y_update))
-                            x_update = int(mss(x_update))
+                            x_update = 0 #int(mss(x_update))
                             yaw_update = int(mss(yaw_update))
 
                             drone.send_rc_control(x_update, z_update, y_update, yaw_update)
+                        break
+                    
+
                     elif id == 4 and flag == 4:
                         z_update = tvec[i, 0, 2] - 75
                         z_update = z_pid.update(z_update, sleep=0)
@@ -195,6 +200,8 @@ def main():
                             yaw_update = int(mss(yaw_update))
 
                             drone.send_rc_control(x_update, z_update, y_update, yaw_update)
+                        break
+
                     elif id == 5 and (flag ==5 or flag == 7):
                         flag = 7
                         z_update = tvec[i, 0, 2] - 150
@@ -211,8 +218,10 @@ def main():
                         deg = rad / math.pi * 180
                         yaw_update = yaw_pid.update(deg, sleep=0)
 
-                        if abs(z_update) <= 10 and abs(yaw_update) <= 10 and abs(x_update) <= 10:
-                            flag = 6
+                        if abs(z_update) <= 10 and abs(yaw_update) <= 15 and abs(x_update) <= 10:
+                            drone.send_rc_control(0,0,0,0)
+                            time.sleep(1)
+                            drone.land()
                         else:
                             z_update = int(mss(z_update) // 2)
                             y_update = int(mss(y_update))
@@ -220,23 +229,23 @@ def main():
                             yaw_update = int(mss(yaw_update))
 
                             drone.send_rc_control(x_update, z_update, y_update, yaw_update)
+                        break
+
                     else:
                         if flag == 5:
-                            drone.send_rc_control(-20, -5, 0, 0)
-                        # elif flag == 4:
-                        #     drone.send_rc_control(0, 0, 0, 30)
-                        elif flag == 6:
-                            drone.send_rc_control(0, 0, -60, 0)
+                            drone.send_rc_control(-20, 0, 0, 0)
+                        # elif flag == 6:
+                        #     drone.send_rc_control(0, 0, -60, 0)
+                        else:
+                            drone.send_rc_control(0, 0, 0, 0)
 
             else:
                 if flag == 2:
                     drone.send_rc_control(0, 0, -30, 0)
-                # elif flag == 4:
-                #     drone.send_rc_control(0, 0, 0, 30)
                 elif flag == 5:
-                    drone.send_rc_control(-20, -5, 0, 0)
-                elif flag == 6:
-                    drone.send_rc_control(0, 0, -60, 0)
+                    drone.send_rc_control(-20, 0, 0, 0)
+                # elif flag == 6:
+                #     drone.send_rc_control(0, 0, -60, 0)
                 else:
                     drone.send_rc_control(0, 0, 0, 0)
         
