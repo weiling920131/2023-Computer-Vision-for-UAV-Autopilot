@@ -227,6 +227,7 @@ def main():
                             y_update = int(mss(y_update))
                             x_update = int(mss(x_update))
                             yaw_update = int(mss(yaw_update))
+                            
 
                             drone.send_rc_control(x_update, z_update, y_update, yaw_update)
                         break
