@@ -34,6 +34,13 @@ def main():
             # for i in range(len(markerIds)):
             frame = cv2.aruco.drawAxis(frame, intrinsic, distortion, rvec[0], tvec[0], 0.1)
             text = "x:" + str(tvec[0, 0, 0]) + " y:" + str(tvec[0, 0, 1]) + " z: " + str(tvec[0, 0, 2])
+            
+            # R, _ = cv2.Rodrigues(rvec[0])
+            # V = np.matmul(R, [0, 0, 1])
+            # rad = math.atan(V[0]/V[2])
+            # deg = rad / math.pi * 180
+            # print("deg: ", deg)
+
             cv2.putText(frame, text, (0, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 1, cv2.LINE_AA)
         
         cv2.imshow("drone", frame)

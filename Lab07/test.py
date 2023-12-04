@@ -167,7 +167,7 @@ def main():
                             drone.send_rc_control(0, 0, 0, 0)
                             time.sleep(0.1)
                             drone.rotate_clockwise(90)
-                            flag = 4
+                            # flag = 4
                         else:
                             z_update = int(mss(z_update) // 2)
                             y_update = int(mss(y_update))
@@ -178,7 +178,7 @@ def main():
                         break
                     
 
-                    elif id == 4 and flag == 4:
+                    elif id == 4:
                         z_update = tvec[i, 0, 2] - 75
                         z_update = z_pid.update(z_update, sleep=0)
                         y_update = -(tvec[i, 0, 1] + 20)
