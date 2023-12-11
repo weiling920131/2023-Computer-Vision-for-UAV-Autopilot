@@ -10,6 +10,7 @@ from utils.general import non_max_suppression_kpt, scale_coords
 from utils.plots import  plot_one_box
 
 WEIGHT = './runs/train/yolov7-lab09/weights/best.pt'
+# WEIGHT = './runs/train/yolov7-lab09/weights/last.pt'
 # WEIGHT = './yolov7-tiny.pt'
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -22,7 +23,10 @@ names = model.module.names if hasattr(model, 'module') else model.names
 colors = [[random.randint(0, 255) for _ in range(3)] for _ in names]
 
 path = '../lab09_test.mp4'
+output_path = '../lab09_output.mp4'
 cap = cv2.VideoCapture(path)
+fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # 使用 MP4 编码器
+out = cv2.VideoWriter(output_path, fourcc, 33, (1280, 720))
 while True:
     ret, image = cap.read()
     if not ret: 
@@ -46,7 +50,8 @@ while True:
         label = f'{names[int(cls)]} {conf:.2f}'
         plot_one_box(xyxy, image_orig, label=label, color=colors[int(cls)], line_thickness=1)
         
-    cv2.imshow("Detected", image_orig)
-    if cv2.waitKey(30) & 0xFF == ord('q'):
-        break
+    # cv2.imshow("Detected", image_orig)
+    out.write(image_orig)
+    # if cv2.waitKey(30) & 0xFF == ord('q'):
+    #     break
     # cv2.waitKey(1)
