@@ -1,33 +1,76 @@
 import cv2
 import numpy as np
 
-# Haar-cascade
-face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
-
-# HOG
-hog = cv2.HOGDescriptor()
-hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
 
 cap = cv2.VideoCapture(0)
-while True:
+fs = cv2.FileStorage("test.xml", cv2.FILE_STORAGE_READ)
+cameraMatrix = fs.getNode("intrinsic").mat()
+distCoeffs = fs.getNode("distortion").mat()
+
+face_objectPoints = np.array([[0,0,0],[13,0,0],[0,17,0],[13,17,0]], dtype=np.float32)
+ped_objectPoints = np.array([[0,0,0],[0.5,0,0],[0,1.75,0],[0.4,1.61,0]], dtype=np.float32)
+
+while(1):
     ret, frame = cap.read()
-    frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    if not ret: break
+    hog = cv2.HOGDescriptor()
+    hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
+    rects, weights = hog.detectMultiScale(frame, winStride=(8,8) ,scale=1.1, useMeanshiftGrouping=False)
+    for x,y,w,h in rects:
+        frame = cv2.rectangle(frame, (x,y), (x+w,y+h), (0,255,255), 2)
+        retval, rvec, tvec = cv2.solvePnP(ped_objectPoints, np.array([[x,y],[x+w,y],[x,y+h],[x+w,y+h]], dtype=np.float32), cameraMatrix, distCoeffs)
+        if(not retval):
+            continue
+        text = " z: " + str(tvec[2])
+        cv2.putText(frame, text, (x, y+h+40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 1, cv2.LINE_AA)
 
-    # Haar-cascade
-    rects = face_cascade.detectMultiScale(frame_gray, scaleFactor=1.2, minNeighbors=5, minSize=(40, 40))
+    face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+    rects = face_cascade.detectMultiScale(frame, 1.15, 3, minSize=(100,100))
+    for x,y,w,h in rects:
+        frame = cv2.rectangle(frame, (x,y), (x+w,y+h), (0,255,0), 2)
+        retval, rvec, tvec = cv2.solvePnP(face_objectPoints, np.array([[x,y],[x+w,y],[x,y+h],[x+w,y+h]], dtype=np.float32), cameraMatrix, distCoeffs)
+        if(not retval):
+            continue
+        text = " z: " + str(tvec[2])
+        cv2.putText(frame, text, (x, y+h+40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 1, cv2.LINE_AA)
 
-    for (x, y, w, h) in rects:
-        frame = cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 3)
 
-    # HOG
-    rects, weights = hog.detectMultiScale(frame_gray, winStride=(8, 8), scale=1.1, useMeanshiftGrouping=False)
+    cv2.imshow('frame', frame)
+    cv2.waitKey(33)
 
-    for (x, y, w, h) in rects:
-        frame = cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 255), 2)
+# import cv2
+# import numpy as np
 
-    cv2.imshow('img', frame)
-    key = cv2.waitKey(33)
-    if key == ord('q'):
-        break
+# fs = cv2.FileStorage("test.xml", cv2.FILE_STORAGE_READ)
+# cameraMatrix = fs.getNode("intrinsic").mat()
+# distCoeffs = fs.getNode("distortion").mat()
 
-cv2.destroyAllWindows()
+# face_objectPoints = np.array([[0,0,0],[13,0,0],[0,17,0],[13,17,0]], dtype=np.float32)
+# ped_objectPoints = np.array([[0,0,0],[0.5,0,0],[0,1.75,0],[0.4,1.61,0]], dtype=np.float32)
+
+# frame = cv2.imread("test1.jpg")
+# hog = cv2.HOGDescriptor()
+# hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
+# rects, weights = hog.detectMultiScale(frame, winStride=(8,8) ,scale=1.1, useMeanshiftGrouping=False)
+# for x,y,w,h in rects:
+#     frame = cv2.rectangle(frame, (x,y), (x+w,y+h), (0,255,255), 2)
+#     retval, rvec, tvec = cv2.solvePnP(ped_objectPoints, np.array([[x,y],[x+w,y],[x,y+h],[x+w,y+h]], dtype=np.float32), cameraMatrix, distCoeffs)
+#     if not retval:
+#         continue
+#     text = " z: " + str(tvec[2])
+#     cv2.putText(frame, text, (x+w, y+h), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 1, cv2.LINE_AA)
+
+# face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+# rects = face_cascade.detectMultiScale(frame, 1.15, 3, minSize=(100,100))
+# for x,y,w,h in rects:
+#     frame = cv2.rectangle(frame, (x,y), (x+w,y+h), (0,255,0), 2)
+#     retval, rvec, tvec = cv2.solvePnP(face_objectPoints, np.array([[x,y],[x+w,y],[x,y+h],[x+w,y+h]], dtype=np.float32), cameraMatrix, distCoeffs)
+#     if not retval:
+#         continue
+#     text = " z: " + str(tvec[2])
+#     cv2.putText(frame, text, (x+w, y+h), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 1, cv2.LINE_AA)
+
+
+# cv2.imshow('frame', frame)
+# cv2.waitKey(0)
+

@@ -1,35 +1,54 @@
 import cv2
 import numpy as np
+import sys
+import matplotlib.pyplot as plt
 
-img = cv2.imread('images/otsu.jpg')
-img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-h, w = img.shape
+def make_histogram(img, mode=256):
+    h, w = img.shape
+    histogram = np.zeros(mode)
+    for i in range(h):
+        for j in range(w):
+            histogram[img[i][j]] += 1
+            
+    return histogram
 
-count = [0] * 256
-for i in range(h):
-    for j in range(w):
-        count[img[i, j]] += 1
+def find_min_threshold(histogram):
+    Min = sys.maxsize
+    min_threshold = 255
+    for threshold in range(1, 255):
+        lower = np.array([])
+        larger = np.array([])
 
-hist = []
-for i in range(256):
-    hist += [i] * count[i]
+        for i in range(threshold+1):
+            lower = np.append(lower, np.full(int(histogram[i]), i))
+        for i in range(threshold+1, 256):
+            larger = np.append(larger, np.full(int(histogram[i]), i))
 
-minV = float('inf')
-t = 0
-for threshold in range(256-1):
-    t += count[threshold]
-    v = np.var(hist[:t]) + np.var(hist[t:])
-    if v <= minV:
-        minV = v
-        minT = threshold
+        if len(lower) == 0 or len(larger) == 0:
+            continue
+        
+        var_low = np.var(np.array(lower))
+        var_lar = np.var(np.array(larger))
+        print(var_low + var_lar)
+        if Min >= var_low + var_lar:
+            Min = var_lar + var_low
+            min_threshold = threshold
 
-new_img = img.copy()
-for i in range(h):
-    for j in range(w):
-        new_img[i, j] = 0 if new_img[i, j] <= minT else 255
+    return min_threshold
 
-cv2.imshow('3', new_img)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+if __name__ == '__main__':
+    img = cv2.imread('images/otsu.jpg')
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    h, w = img.shape
+    
+    histogram = make_histogram(img)
+    min_threshold = find_min_threshold(histogram)
 
-cv2.imwrite('output/3.jpg', new_img)
+    # print(histogram)
+    for i in range(h):
+        for j in range(w):
+            img[i][j] = 0 if img[i][j] <= min_threshold else 255
+    
+    cv2.imwrite('output/3.png', img)
+    cv2.imshow('img', img)
+    cv2.waitKey(0)
