@@ -17,15 +17,15 @@ while True:
     rects = face_cascade.detectMultiScale(frame_gray, scaleFactor=1.2, minNeighbors=5, minSize=(40, 40))
 
     for (x, y, w, h) in rects:
-        img = cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 3)
+        frame = cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 3)
 
     # HOG
     rects, weights = hog.detectMultiScale(frame_gray, winStride=(8, 8), scale=1.1, useMeanshiftGrouping=False)
 
     for (x, y, w, h) in rects:
-        img = cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 255), 2)
+        frame = cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 255), 2)
 
-    cv2.imshow('img', img)
+    cv2.imshow('img', frame)
     key = cv2.waitKey(33)
     if key == ord('q'):
         break
