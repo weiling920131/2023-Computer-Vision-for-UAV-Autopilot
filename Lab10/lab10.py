@@ -69,7 +69,7 @@ def main():
 
     flag = 0
     while True:
-        print("check")
+        # print("check")
         key = cv2.waitKey(1)
         if key != -1:
             if key == ord('q'):
@@ -87,7 +87,7 @@ def main():
                     id = markerIds[i][0]
                     if id == 4 and flag == 0:
                         # when id1 img < 150，then  
-                        z_update = tvec[i, 0, 2] - 45
+                        z_update = tvec[i, 0, 2] - 40
                         y_update = -(tvec[i, 0, 1] + 20)
                         x_update = tvec[i, 0, 0]
                         z_update = z_pid.update(z_update, sleep=0)
@@ -101,8 +101,10 @@ def main():
                         yaw_update = yaw_pid.update(deg, sleep=0)
 
                         if abs(z_update) <= 5 and abs(yaw_update) <= 5 and abs(y_update) <= 10 and abs(x_update) <= 10:
-                            drone.send_rc_control(20, 0, 0, 0)
-                            time.sleep(1)
+                            drone.send_rc_control(0, 0, 0, 0)
+                            time.sleep(2)
+                            drone.send_rc_control(10, 0, 0, 0)
+                            time.sleep(2)
                             flag = 1
                         else:
                             z_update = int(mss(z_update) // 2)
@@ -110,32 +112,10 @@ def main():
                             x_update = int(mss(x_update))
                             yaw_update = int(mss(yaw_update))
                             drone.send_rc_control(x_update, z_update, y_update, yaw_update)
-                    elif id == 4 and flag == 1:
+                          # cv2.imshow("drone_gray", threshold_image)
+                    elif id == 4 and flag == 2:
                         drone.land()
-            else:
-                if flag == 0:
-                    continue
-                gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-                gray = cv2.GaussianBlur(gray, (5, 5), 0)
-
-                _, frame = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY)
-                height, weight = frame.shape
-                one, two, three = line_follower(frame, height, weight)
-                direction = 1
-                if one == 0 and two == 1 and three == 0:
-                    drone.send_rc_control(10*direction, 0, 0, 0)
-                elif one == 1 and two == 1 and three == 0:
-                    drone.send_rc_control(10*direction, 5, 0, 0)
-                elif one == 0 and two == 1 and three == 1:
-                    drone.send_rc_control(10*direction, -5, 0, 0)
-                elif one == 1 and two == 0 and three == 0:
-                    drone.send_rc_control(10*direction, 10, 0, 0)
-                elif one == 0 and two == 0 and three == 1:
-                    drone.send_rc_control(10*direction, -10, 0, 0)
-                else:
-                    drone.send_rc_control(0, 0, 0, 0)
-                    drone.land()
-                # cv2.imshow("drone_gray", threshold_image)
+                   
         cv2.imshow("drone", frame)
 
 if __name__ == '__main__':

@@ -1,9 +1,9 @@
 def keyboard(self, key):
     #global is_flying
     print("key:", key)
-    fb_speed = 50
-    lf_speed = 50
-    ud_speed = 60
+    fb_speed = 20
+    lf_speed = 20
+    ud_speed = 20
     degree = 30
     if key == ord('1'):
         self.takeoff()
