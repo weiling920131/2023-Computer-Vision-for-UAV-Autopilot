@@ -1,0 +1,261 @@
+﻿body
+{
+	background-color: #e9e9d9;
+	margin-left: 0px;
+	margin-top: 0px;
+	margin-right: 0px;
+	margin-bottom: 0px;
+}
+body,td,th
+{
+	font-size: 12px;
+	color: #333333;
+}
+a:link
+{
+	color: #005000;
+	text-decoration: none;
+}
+a:visited
+{
+	text-decoration: none;
+	color: #005000;
+}
+a:hover
+{
+	text-decoration: none;
+	color: #CC9900;
+}
+a:active
+{
+	text-decoration: none;
+	color: #CC9900;
+}
+.tital_frame_LINK {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	line-height: 1.9em;
+	color: #333333;
+	text-decoration: none;
+}
+.tital_frame {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 13px;
+	line-height: 2em;
+	font-weight: bold;
+	color: #000000;
+	text-decoration: none;
+}
+.top_menu_ovdw {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 14px;
+	font-weight: bold;
+	color: #CC3333;
+	text-decoration: none;
+}
+.top_menu_nane {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 14px;
+	color: #AC6C4A;
+	text-decoration: none;
+}
+.top_right_text {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	color: #FFFFFF;
+	text-decoration: none;
+}
+.your_location {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	color: #056C69;
+	text-decoration: none;
+	line-height: 1.8em;
+}
+.table
+{
+	border: 2px;
+	border-spacing: 2;
+	border-style: solid;
+}
+.table_tital {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 13px;
+	color: #406017;
+	text-decoration: none;
+	line-height: 2em;
+	background-color: #BFEA87;
+	text-align: center;
+	vertical-align: bottom;
+}
+.table_tital_top {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 13px;
+	color: #DD410D;
+	background-color: #F9AA7B;
+	text-decoration: none;
+	line-height: 1.9em;
+	font-weight: normal;
+}
+
+.table_empty {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 13px;	
+	color: #DD410D;
+	text-decoration: none;
+	text-align: center;
+	line-height: 5em;
+	background-color: #FFFFEE;
+}
+
+.table_text {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 13px;
+	color: #333333;
+	text-decoration: none;
+	line-height: 1.9em;
+	background-color: #FFFFEE;
+}
+
+.table_alt {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 13px;
+	color: #333333;
+	text-decoration: none;
+	line-height: 1.9em;
+	background-color: #FFFFFF;
+}
+
+.detail_tital {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 13px;
+	color: #406017;
+	text-decoration: none;
+	line-height: 2em;
+	background-color: #BFEA87;
+	text-align: left;
+	vertical-align: middle;
+}
+
+.detail_text {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 13px;
+	color: #333333;
+	text-decoration: none;
+	line-height: 1.9em;
+	background-color: #FFFFEE;
+}
+
+.bt {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	text-decoration: none;
+}
+
+.copyright {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 13px;
+	line-height: 4em;
+	color: #000000;
+	text-decoration: none;
+}
+
+
+.login_ID_text {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	color: #E50B1A;
+	text-decoration: none;
+	line-height: 1.8em;
+}
+.PagerContainerTable
+{
+	border-right: #333333 1px solid;
+	border-top: #333333 1px solid;
+	border-left: #333333 1px solid;
+	color: #d1d1e1;
+	border-bottom: #333333 1px solid;
+	background-color: #FFFFFF;
+}
+.PagerInfoCell
+{
+	padding-right: 6px;
+	padding-left: 6px;
+	padding-bottom: 3px;
+	font: bold 11px arial, verdana, geneva, lucida, 'lucida grande' , arial, helvetica, sans-serif;
+	color: #f0f1f2;
+	padding-top: 3px;
+	white-space: nowrap;
+	background-color: #990000;
+	font-weight:normal;
+}
+.PagerInfoCell:link
+{
+	color: #ffcc66;
+	text-decoration: none;
+}
+.PagerInfoCell:visited
+{
+	color: #ffcc66;
+	text-decoration: none;
+}
+.PagerCurrentPageCell
+{
+	color: #990000;
+	background-color: #FFFF99;
+}
+.PagerOtherPageCells
+{
+	background-color: #f0f1f2;
+}
+.PagerSSCCells
+{
+	background-color: #cccccc;
+}
+.PagerHyperlinkStyle
+{
+	font: 11px arial, verdana, geneva, lucida, 'lucida grande' , arial, helvetica, sans-serif;
+}
+.PagerHyperlinkStyle:hover
+{
+	color: #000000;
+	text-decoration: none;
+	font: 11px arial, verdana, geneva, lucida, 'lucida grande' , arial, helvetica, sans-serif;
+}
+.PagerHyperlinkStyle:link
+{
+	color: #000000;
+	text-decoration: none;
+	font: 11px arial, verdana, geneva, lucida, 'lucida grande' , arial, helvetica, sans-serif;
+}
+.PagerHyperlinkStyle:visited
+{
+	color: #000000;
+	text-decoration: none;
+	font: 11px arial, verdana, geneva, lucida, 'lucida grande' , arial, helvetica, sans-serif;
+}
+.PagerHyperlinkStyle:active
+{
+	color: #000000;
+	text-decoration: none;
+	font: 11px arial, verdana, geneva, lucida, 'lucida grande' , arial, helvetica, sans-serif;
+}
+.ch_head {
+	vertical-align:baseline;
+	word-spacing:normal;
+	background-color:#CCCC66;
+	border-width:0.5px;
+	color: #333333;
+	font-size:13px;
+	font-weight:bold;
+	text-align:center;
+}
+.table2add {
+	vertical-align:baseline;
+	word-spacing:normal;
+	background-color: wheat;
+	border-width:0.5px;
+	color: #333333;
+	font-size:13px;
+	text-align:left;
+}
