@@ -44,3 +44,4 @@ def keyboard(self, key):
     if key == ord('6'):
         battery = self.get_battery()
         print (battery)
+    

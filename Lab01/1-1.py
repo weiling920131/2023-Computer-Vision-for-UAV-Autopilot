@@ -2,18 +2,15 @@ import cv2
 import numpy as np
 
 img = cv2.imread('images/nctu_flag.jpg')
-new_img = img.copy()
-h, w, _ = img.shape
+x, y, _ = img.shape
+for i in range(x):
+    for j in range(y):
+        if img[i, j][0] > 70 and img[i, j][0]*0.8 > img[i, j][1] and img[i, j][0]*0.8 > img[i, j][2]:
+            continue
+        else:
+            new = sum(img[i, j])/3
+            img[i, j] = [new, new, new]
 
-for i in range(h):
-    for j in range(w):
-        B, G, R = img[i, j]
-        if not (B > 70 and B * 0.8 > G and B * 0.8 > R):
-            avg = B / 3 + G / 3 + R / 3
-            new_img[i, j] = avg
-
-cv2.imshow('1-1', new_img)
+cv2.imwrite('./output/1-1.png', img)
+cv2.imshow('img',img)
 cv2.waitKey(0)
-cv2.destroyAllWindows()
-
-cv2.imwrite('output/1-1.jpg', new_img)

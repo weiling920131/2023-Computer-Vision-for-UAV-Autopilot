@@ -43,6 +43,8 @@ def main():
     while True:
         key = cv2.waitKey(1)
         if key != -1:
+            if key == ord('q'):
+                break
             keyboard(drone, key)
         else:
             frame = frame_read.frame
@@ -95,4 +97,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

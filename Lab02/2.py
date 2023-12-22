@@ -1,52 +1,52 @@
 import cv2
 import numpy as np
 
-def histogram(img, c):
+def make_transformation(img, color, mode=256):
     h, w, _ = img.shape
-    hist = [0] * 256
+    histogram = np.zeros(mode)
     for i in range(h):
         for j in range(w):
-            hist[img[i, j ,c]] += 1
+            histogram[img[i][j][color]] += 1
+    trans = np.zeros(mode)
+    for i in range(mode):
+        trans[i] = (mode-1)  * sum(histogram[0:i+1])/(h*w)
 
-    trans = [0] * 256
-    for k in range(256):
-        trans[k] = round(255 * sum(hist[0:k+1]) / (h * w))
+    return trans
 
-    return np.array(trans)
+def BGR_histogram(img):
+    h, w, _ = img.shape
+    new_img = np.zeros([h, w, 3], dtype=np.uint8)
+    b_trans = make_transformation(img, 0)
+    g_trans = make_transformation(img, 1)
+    r_trans = make_transformation(img, 2)
 
+    for i in range(h):
+        for j in range(w):
+            new_img[i][j] = [b_trans[img[i][j][0]], g_trans[img[i][j][1]], r_trans[img[i][j][2]]]
 
-img = cv2.imread('images/histogram.jpg')
-h, w, _ = img.shape
+    return new_img
 
-# 2-a: BGR
-new_img_a = img.copy()
-trans_B = histogram(img, 0)
-trans_G = histogram(img, 1)
-trans_R = histogram(img, 2)
+def HSV_histogram(img):
+    h, w, _ = img.shape
+    new_img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
-for i in range(h):
-    for j in range(w):
-        new_img_a[i, j] = [trans_B[img[i, j, 0]], trans_G[img[i, j, 1]], trans_R[img[i, j, 2]]]
+    v_trans = make_transformation(new_img, 2)
+    for i in range(h):
+        for j in range(w):
+            new_img[i][j][2] = v_trans[new_img[i][j][2]]
 
-cv2.imshow('2-a', new_img_a)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+    new_img = cv2.cvtColor(new_img, cv2.COLOR_HSV2BGR)
+    return new_img
+    
 
-cv2.imwrite('output/2-a.jpg', new_img_a)
+if __name__ == '__main__':
+    img = cv2.imread('images/histogram.jpg')
+    bgr_img = BGR_histogram(img)
+    cv2.imwrite('output/2-a.png', bgr_img)
+    cv2.imshow('img', bgr_img)
+    cv2.waitKey(0)
 
-# 2-b: HSV
-img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-new_img_b = img.copy()
-trans_V = histogram(img, 2)
-
-for i in range(h):
-    for j in range(w):
-        new_img_b[i, j, 2] = trans_V[img[i, j, 2]]
-
-new_img_b = cv2.cvtColor(new_img_b, cv2.COLOR_HSV2BGR)
-
-cv2.imshow('2-b', new_img_b)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
-
-cv2.imwrite('output/2-b.jpg', new_img_b)
+    hsv_img = HSV_histogram(img)
+    cv2.imwrite('output/2-b.png', hsv_img)
+    cv2.imshow('img', hsv_img)
+    cv2.waitKey(0)
