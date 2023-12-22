@@ -29,7 +29,8 @@ def main():
     fs = cv2.FileStorage("calibrateCamera.xml", cv2.FILE_STORAGE_READ)
     intrinsic = fs.getNode("intrinsic").mat()
     distortion = fs.getNode("distortion").mat()
-
+    fs.release()
+    
     z_pid = PID(kP=0.7, kI=0.0001, kD=0.1)
     y_pid = PID(kP=0.7, kI=0.0001, kD=0.1)
     yaw_pid = PID(kP=0.7, kI=0.0001, kD=0.1)
