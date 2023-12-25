@@ -260,7 +260,7 @@ def main():
     x_pid.initialize()
     yaw_pid.initialize()
 
-    flag = 33
+    flag = 0
     path = 0
     path_flag = 0
     doll = ''
@@ -376,21 +376,14 @@ def main():
                         if abs(x_update) <= 10 and abs(z_update) <= 10 and abs(yaw_update) <= 2:
                             # TODO: put detect result to doll
                             drone.send_rc_control(0, 0,0, 0)
-                            time.sleep(0.5)
                             drone.rotate_clockwise(90)
-                            time.sleep(0.5)
-                            drone.send_rc_control(0,0,0,0)
-                            time.sleep(0.5)
-                            drone.send_rc_control(0,-25,0,0)
-                            time.sleep(2)
-                            # drone.move_back(100)
-                            flag = 33
+                            # flag = 3
 
                         else:
                             z_update = int(mss(z_update) // 2)
                             y_update = int(mss(y_update))
                             x_update = int(mss(x_update))
-                            yaw_update = int(mss(yaw_update)-1)
+                            yaw_update = int(mss(yaw_update))
                             drone.send_rc_control(x_update, z_update, y_update, yaw_update)
                         break
 
@@ -810,12 +803,12 @@ def main():
                                     # print("stop")
                                     drone.send_rc_control(0, 0, 0, 0)
 
-                elif flag == 33:
+                elif flag == 3:
                     ####################
                     # face detect
                     ####################
                     face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
-                    rects = face_cascade.detectMultiScale(frame, 1.15, 6, minSize=(50,50))
+                    rects = face_cascade.detectMultiScale(frame, 1.15, 3, minSize=(100,100))
                     face2_num = 0
                     faces_x = []
                     for x,y,w,h in rects:
@@ -845,7 +838,6 @@ def main():
                         if abs(x_update) < 5:
                             #TODO go to flag 4
                             flag = 4
-                            # print("check")
                             # go forward for a while
                             # drone.send_rc_control(x_update, z_update, y_update, yaw_update)
                             drone.send_rc_control(0, 50, 0, 0)
@@ -859,11 +851,9 @@ def main():
                         break
                     else:
                         # if not found 2 faces yet, keep go to right
-                        drone.send_rc_control(18, -1, 0, 0)  
+                        drone.send_rc_control(10, 0, 0, 0)  
                 elif flag == 4:
                     drone.send_rc_control(0, 0,0,-10)
-                else:
-                    drone.send_rc_control(0, 0,0,0)
             
             cv2.imshow('frame', frame)
             cv2.waitKey(1)
