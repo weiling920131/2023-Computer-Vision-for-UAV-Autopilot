@@ -1,0 +1,13 @@
+train: ../train/images
+val: ../valid/images
+test: ../test/images
+
+nc: 2
+names: ['cana', 'melody']
+
+roboflow:
+  workspace: 2023-uav
+  project: lab09-tvkpt
+  version: 2
+  license: MIT
+  url: https://universe.roboflow.com/2023-uav/lab09-tvkpt/dataset/2
