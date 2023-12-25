@@ -716,7 +716,7 @@ def main():
                                 drone.send_rc_control(0, 0, -y_speed, 0)
                             elif path_flag == 7:    #left (under table)
                                 drone.send_rc_control(-speed, 0, 0, 0)
-                                time.sleep(2)
+                                # time.sleep(2)
                             else:
                                 if black == [[0, 0, 0],
                                             [0, 0, 0], 
@@ -802,7 +802,7 @@ def main():
                                 drone.send_rc_control(0, 0, -y_speed, 0)
                             elif path_flag == 3:    #left (under table)
                                 drone.send_rc_control(-speed, 0, 0, 0)
-                                time.sleep(2)
+                                # time.sleep(2)
                             else:
                                 if black == [[0, 0, 0],
                                             [0, 0, 0], 
