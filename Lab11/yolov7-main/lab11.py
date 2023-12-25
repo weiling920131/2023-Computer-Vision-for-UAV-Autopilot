@@ -15,6 +15,202 @@ from djitellopy import Tello
 from pyimagesearch.pid import PID
 from keyboard_djitellopy import keyboard
 
+horizontal = [
+    [[1, 1, 1],
+     [0, 0, 0],
+     [0, 0, 0]],
+
+    [[0, 0, 0],
+     [1, 1, 1],
+     [0, 0, 0]],
+
+    [[0, 0, 0],
+     [0, 0, 0],
+     [1, 1, 1]]
+]
+
+vertical = [
+    [[1, 0, 0],
+     [1, 0, 0],
+     [1, 0, 0]],
+
+    [[0, 1, 0],
+     [0, 1, 0],
+     [0, 1, 0]],
+
+    [[0, 0, 1],
+     [0, 0, 1],
+     [0, 0, 1]]
+]
+
+corner_ul = [
+    [[0, 1, 0],
+     [1, 1, 0], 
+     [0, 0, 0]],
+
+    [[1, 0, 0],
+     [0, 0, 0], 
+     [0, 0, 0]],
+
+    [[1, 1, 0], 
+     [0, 0, 0], 
+     [0, 0, 0]],
+
+    [[1, 0, 0], 
+     [1, 0, 0], 
+     [0, 0, 0]],
+
+    [[0, 0, 1],
+     [1, 1, 1],
+     [0, 0, 0]],
+
+    [[0, 1, 0], 
+     [0, 1, 0], 
+     [1, 1, 0]],
+
+    [[0, 0, 1], 
+     [0, 0, 1], 
+     [1, 1, 1]]
+]
+
+corner_ur = [
+    [[0, 1, 0],
+     [0, 1, 1], 
+     [0, 0, 0]],
+
+    [[1, 0, 0],
+     [1, 0, 0], 
+     [1, 1, 1]],
+
+    [[0, 1, 0],
+     [0, 1, 0], 
+     [0, 1, 1]],
+
+    [[1, 0, 0],
+     [1, 1, 1], 
+     [0, 0, 0]],
+
+    [[0, 0, 1],
+     [0, 0, 1], 
+     [0, 0, 0]],
+
+    [[0, 1, 1],
+     [0, 0, 0], 
+     [0, 0, 0]],
+
+    [[0, 0, 1],
+     [0, 0, 0], 
+     [0, 0, 0]]
+]
+
+corner_dl = [
+    [[0, 0, 0],
+     [1, 1, 0],
+     [0, 1, 0]],
+
+    [[1, 1, 0],
+     [0, 1, 0], 
+     [0, 1, 0]],
+
+    [[1, 1, 1],
+     [0, 0, 1], 
+     [0, 0, 1]],
+
+    [[0, 0, 0],
+     [1, 0, 0], 
+     [1, 0, 0]],
+
+    [[0, 0, 0],
+     [1, 1, 1], 
+     [0, 0, 1]],
+
+    [[0, 0, 0],
+     [0, 0, 0], 
+     [1, 0, 0]],
+
+    [[0, 0, 0],
+     [0, 0, 0], 
+     [1, 1, 0]]
+]
+
+corner_dr = [
+    [[0, 0, 0],
+     [0, 1, 1], 
+     [0, 1, 0]],
+
+    [[1, 1, 1],
+     [1, 0, 0], 
+     [1, 0, 0]],
+
+    [[0, 1, 1],
+     [0, 1, 0], 
+     [0, 1, 0]],
+
+    [[0, 0, 0],
+     [1, 1, 1], 
+     [1, 0, 0]],
+
+    [[0, 0, 0],
+     [0, 0, 1], 
+     [0, 0, 1]],
+
+    [[0, 0, 0],
+     [0, 0, 0], 
+     [0, 1, 1]],
+
+    [[0, 0, 0],
+     [0, 0, 0], 
+     [0, 0, 1]]
+]
+
+corner_ulr = [
+    [[0, 1, 0],
+     [1, 1, 1], 
+     [0, 0, 0]],
+
+    [[1, 0, 0],
+     [1, 0, 0], 
+     [1, 1, 1]],
+
+    [[0, 1, 0],
+     [0, 1, 0], 
+     [1, 1, 1]],
+
+    [[0, 0, 1],
+     [0, 0, 1], 
+     [1, 1, 1]],
+
+    [[1, 0, 0],
+     [1, 1, 1], 
+     [0, 0, 0]],
+
+    [[0, 0, 1],
+     [1, 1, 1], 
+     [0, 0, 0]]
+]
+
+def line_follower(frame, h, w):
+    threshold = 0.35
+    num_rows = 3
+    num_cols = 3
+    cell_height = h // num_rows
+    cell_width = w // num_cols
+    black = np.zeros((num_cols, num_rows))
+
+    for i in range(num_rows):
+        for j in range(num_cols):
+            cell = frame[i * cell_height:(i + 1) * cell_height, j * cell_width:(j + 1) * cell_width]
+
+            black_pixels = np.sum(cell == 0)
+            pixels = cell_height * cell_width
+
+            if(black_pixels > pixels * threshold):
+                black[i][j] = 1
+
+            cv2.rectangle(frame, (j * cell_width, i * cell_height), ((j + 1) * cell_width, (i + 1) * cell_height), 0, 2)
+
+    return black.tolist()
+
 WEIGHT = './runs/train/yolov7-lab09/weights/best.pt'
 # WEIGHT = './runs/train/yolov7-lab09/weights/last.pt'
 # WEIGHT = './yolov7-tiny.pt'
@@ -64,6 +260,7 @@ def main():
 
     flag = 0
     path = 0
+    path_flag = 0
     doll = ''
 
     face_objectPoints = np.array([[0,0,0],[13,0,0],[0,17,0],[13,17,0]], dtype=np.float32)
@@ -132,7 +329,7 @@ def main():
                         deg = rad / math.pi * 180
                         yaw_update = yaw_pid.update(deg, sleep=0)
                         # if match rule, then land! 
-                        # congrauation, you finish final!
+                        # congratulation, you finish final!
                         if abs(x_update) <= 10 and abs(z_update) <= 10 and abs(yaw_update) <= 5 and flag == 1:
                             # TODO: put detect result to doll
                             # doll = "Melody"
@@ -210,12 +407,194 @@ def main():
                             drone.send_rc_control(0, 0, 0, -10)
             else: # if does't detect aruco, check with flag
                 if flag == 2:
-                    if path == 1: # Melody
-                        # TODO: Second don't go up
-                        pass
-                    elif path == 2: # Cana
-                        # TODO: first don't go up
-                        pass
+                    frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+                    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+                    
+                    gray = cv2.bitwise_not(gray)
+                    gray = cv2.erode(gray, (7, 7), iterations=3)
+                    gray = cv2.dilate(gray, (7, 7), iterations=3)
+                    gray = cv2.bitwise_not(gray)
+                    h, w = gray.shape
+
+                    gray = gray[int(h/5):int(h/5*4), int(w/5):int(w/5*4)]
+                    h, w = gray.shape
+                    gray = cv2.GaussianBlur(gray, (7, 7), 0)
+
+                    _, frame = cv2.threshold(gray, 50, 255, cv2.THRESH_BINARY)
+
+                    black = line_follower(frame, h, w)
+
+                    speed = 10
+                    # print(black, '\n')
+                    if black == [[1, 1, 1],
+                                [1, 1, 1], 
+                                [1, 1, 1]]:
+                        drone.send_rc_control(0, -speed, 0, 0)  # too close, go back
+                        
+                    # Melody
+                    if path == 1:
+                        if path_flag == 0 and (black in corner_dl or black in horizontal):
+                            drone.send_rc_control(0, 0, 0, 0)
+                            time.sleep(1)
+                            drone.send_rc_control(-speed, 0, 0, 0)
+                            time.sleep(0.5)
+                            path_flag += 1
+
+                        elif path_flag == 1 and (black in corner_ulr or black in vertical):
+                            drone.send_rc_control(0, 0, 0, 0)
+                            time.sleep(1)
+                            drone.send_rc_control(0, 0, speed * 2, 0)
+                            time.sleep(0.5)
+                            path_flag += 1
+
+                        elif path_flag == 2 and (black in corner_dl or black in horizontal):
+                            drone.send_rc_control(0, 0, 0, 0)
+                            time.sleep(1)
+                            drone.send_rc_control(-speed, 0, 0, 0)
+                            time.sleep(0.5)
+                            path_flag += 1
+
+                        elif path_flag == 3 and (black in corner_dr or black in vertical):
+                            drone.send_rc_control(0, 0, 0, 0)
+                            time.sleep(1)
+                            drone.send_rc_control(0, 0, -speed * 2, 0)
+                            time.sleep(0.5)
+                            path_flag += 1
+
+                        elif path_flag == 4 and (black in corner_ulr or black in horizontal):
+                            drone.send_rc_control(0, 0, 0, 0)
+                            time.sleep(1)
+                            drone.send_rc_control(-speed, 0, 0, 0)
+                            time.sleep(0.5)
+                            path_flag += 1
+
+                        elif path_flag == 5 and (black in corner_dr or black in vertical):
+                            drone.send_rc_control(0, 0, 0, 0)
+                            time.sleep(1)
+                            drone.send_rc_control(0, 0, -speed * 2, 0)
+                            time.sleep(0.5)
+                            path_flag += 1
+
+                        elif path_flag == 6 and (black in corner_ul or black in horizontal):
+                            drone.send_rc_control(0, 0, 0, 0)
+                            time.sleep(1)
+                            drone.send_rc_control(-speed, 0, 0, 0)
+                            time.sleep(0.5)
+                            path_flag += 1
+
+                        elif path_flag == 7 and (black in corner_ur or black in vertical):
+                            drone.send_rc_control(0, 0, 0, 0)
+                            time.sleep(1)
+                            drone.send_rc_control(0, 0, speed * 2, 0)
+                            time.sleep(0.5)
+                            path_flag += 1
+
+                        elif path_flag == 8 and (black in corner_dl or black in horizontal):
+                            drone.send_rc_control(0, 0, 0, 0)
+                            time.sleep(1)
+                            drone.send_rc_control(-speed, 0, 0, 0)
+                            time.sleep(0.5)
+                            path_flag += 1
+
+                        else:
+                            if path_flag == 0 or path_flag == 2 or path_flag == 8:  # up
+                                drone.send_rc_control(0, 0, speed * 2, 0)
+                            elif path_flag == 1 or path_flag == 3 or path_flag == 5 or path_flag == 9:    # left
+                                drone.send_rc_control(-speed, 0, 0, 0)
+                            elif path_flag == 4 or path_flag == 6:    # down
+                                drone.send_rc_control(0, 0, -speed * 2, 0)
+                            elif path_flag == 7:    #left (under table)
+                                drone.send_rc_control(-speed, 0, 0, 0)
+                                time.sleep(2)
+                            else:
+                                if black == [[0, 0, 0],
+                                            [0, 0, 0], 
+                                            [0, 0, 0]]:
+                                    # print("stop")
+                                    drone.send_rc_control(0, 0, 0, 0)
+
+                    # Cana
+                    elif path == 2:
+                        if path_flag == 0 and (black in corner_dl or black in horizontal):
+                            drone.send_rc_control(0, 0, 0, 0)
+                            time.sleep(1)
+                            drone.send_rc_control(-speed, 0, 0, 0)
+                            time.sleep(0.5)
+                            path_flag += 1
+
+                        elif path_flag == 1 and (black in corner_dr):
+                            drone.send_rc_control(0, 0, 0, 0)
+                            time.sleep(1)
+                            drone.send_rc_control(0, 0, -speed * 2, 0)
+                            time.sleep(0.5)
+                            path_flag += 1
+
+                        elif path_flag == 2 and (black in corner_ul or black in horizontal):
+                            drone.send_rc_control(0, 0, 0, 0)
+                            time.sleep(1)
+                            drone.send_rc_control(-speed, 0, 0, 0)
+                            time.sleep(0.5)
+                            path_flag += 1
+
+                        elif path_flag == 3 and (black in corner_ur or black in vertical):
+                            drone.send_rc_control(0, 0, 0, 0)
+                            time.sleep(1)
+                            drone.send_rc_control(0, 0, speed * 2, 0)
+                            time.sleep(0.5)
+                            path_flag += 1
+
+                        elif path_flag == 4 and (black in corner_dl or black in horizontal):
+                            drone.send_rc_control(0, 0, 0, 0)
+                            time.sleep(1)
+                            drone.send_rc_control(-speed, 0, 0, 0)
+                            time.sleep(0.5)
+                            path_flag += 5
+
+                        elif path_flag == 5 and (black in corner_ulr or black in vertical):
+                            drone.send_rc_control(0, 0, 0, 0)
+                            time.sleep(1)
+                            drone.send_rc_control(0, 0, speed * 2, 0)
+                            time.sleep(0.5)
+                            path_flag += 1
+
+                        elif path_flag == 6 and (black in corner_dl or black in horizontal):
+                            drone.send_rc_control(0, 0, 0, 0)
+                            time.sleep(1)
+                            drone.send_rc_control(-speed, 0, 0, 0)
+                            time.sleep(0.5)
+                            path_flag += 1
+
+                        elif path_flag == 7 and (black in corner_dr or black in vertical):
+                            drone.send_rc_control(0, 0, 0, 0)
+                            time.sleep(1)
+                            drone.send_rc_control(0, 0, -speed * 2, 0)
+                            time.sleep(0.5)
+                            path_flag += 1
+
+                        elif path_flag == 8 and (black in corner_ulr or black in horizontal):
+                            drone.send_rc_control(0, 0, 0, 0)
+                            time.sleep(1)
+                            drone.send_rc_control(-speed, 0, 0, 0)
+                            time.sleep(0.5)
+                            path_flag += 1
+
+                        else:
+                            if path_flag == 0 or path_flag == 4 or path_flag == 6:  # up
+                                drone.send_rc_control(0, 0, speed * 2, 0)
+                            elif path_flag == 1 or path_flag == 5 or path_flag == 7 or path_flag == 9:    # left
+                                drone.send_rc_control(-speed, 0, 0, 0)
+                            elif path_flag == 2 or path_flag == 8:    # down
+                                drone.send_rc_control(0, 0, -speed * 2, 0)
+                            elif path_flag == 3:    #left (under table)
+                                drone.send_rc_control(-speed, 0, 0, 0)
+                                time.sleep(2)
+                            else:
+                                if black == [[0, 0, 0],
+                                            [0, 0, 0], 
+                                            [0, 0, 0]]:
+                                    # print("stop")
+                                    drone.send_rc_control(0, 0, 0, 0)
+
                 elif flag == 3:
                     ####################
                     # face detect
