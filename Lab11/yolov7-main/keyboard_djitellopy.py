@@ -1,8 +1,8 @@
 def keyboard(self, key):
     #global is_flying
     print("key:", key)
-    fb_speed = 40
-    lf_speed = 40
+    fb_speed = 50
+    lf_speed = 50
     ud_speed = 50
     degree = 30
     if key == ord('1'):
@@ -28,10 +28,10 @@ def keyboard(self, key):
         print("right!!!!")
     if key == ord('z'):
         self.send_rc_control(0, 0, ud_speed, 0)
-        print("down!!!!")
+        print("up!!!!")
     if key == ord('x'):
         self.send_rc_control(0, 0, (-1) *ud_speed, 0)
-        print("up!!!!")
+        print("down!!!!")
     if key == ord('c'):
         self.send_rc_control(0, 0, 0, degree)
         print("rotate!!!!")
