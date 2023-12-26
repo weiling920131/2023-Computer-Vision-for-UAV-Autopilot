@@ -55,13 +55,13 @@ def get_corner_ul():
      [1, 1, 1],
      [0, 0, 0]],
 
-    [[0, 1, 0], 
-     [0, 1, 0], 
-     [1, 1, 0]],
+    # [[0, 1, 0], 
+    #  [0, 1, 0], 
+    #  [1, 1, 0]],
 
-    [[0, 0, 1], 
-     [0, 0, 1], 
-     [1, 1, 1]]
+    # [[0, 0, 1], 
+    #  [0, 0, 1], 
+    #  [1, 1, 1]]
     ]
 
 def get_corner_ur():
@@ -102,13 +102,13 @@ def get_corner_dl():
      [1, 1, 0],
      [0, 1, 0]],
 
-    [[1, 1, 0],
-     [0, 1, 0], 
-     [0, 1, 0]],
+    # [[1, 1, 0],
+    #  [0, 1, 0], 
+    #  [0, 1, 0]],
 
-    [[1, 1, 1],
-     [0, 0, 1], 
-     [0, 0, 1]],
+    # [[1, 1, 1],
+    #  [0, 0, 1], 
+    #  [0, 0, 1]],
 
     [[0, 0, 0],
      [1, 0, 0], 
@@ -185,8 +185,25 @@ def get_corner_ulr():
      [0, 0, 0]]
     ]
 
-def line_follower(frame, h, w):
-    threshold = 0.35
+def get_corner_cana1():
+    return [
+    [[0, 0, 1],
+     [1, 1, 1],
+     [1, 0, 0]],
+
+    [[0, 1, 0],
+     [1, 1, 1],
+     [1, 0, 0]]
+    ]
+
+def get_corner_cana2():
+    return [
+    [[1, 0, 0],
+     [1, 1, 1],
+     [0, 0, 1]]
+    ]
+
+def line_follower(frame, h, w, threshold=0.1):
     num_rows = 3
     num_cols = 3
     cell_height = h // num_rows
@@ -205,4 +222,5 @@ def line_follower(frame, h, w):
 
             cv2.rectangle(frame, (j * cell_width, i * cell_height), ((j + 1) * cell_width, (i + 1) * cell_height), 0, 2)
 
+    print(black)
     return black.tolist()

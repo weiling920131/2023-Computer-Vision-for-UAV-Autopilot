@@ -23,6 +23,9 @@ corner_ur = lab11info.get_corner_ur()
 corner_dl = lab11info.get_corner_dl()
 corner_dr = lab11info.get_corner_dr()
 corner_ulr = lab11info.get_corner_ulr()
+corner_cana1 = lab11info.get_corner_cana1()
+corner_cana2 = lab11info.get_corner_cana2()
+
 
 
 WEIGHT = './runs/train/yolov7-lab09/weights/best.pt'
@@ -36,7 +39,7 @@ else:
 names = model.module.names if hasattr(model, 'module') else model.names
 colors = [[random.randint(0, 255) for _ in range(3)] for _ in names]
 
-def mss(update, max_speed_threshold=30):
+def mss(update, max_speed_threshold=40):
     if update > max_speed_threshold:
         update = max_speed_threshold
     elif update < -max_speed_threshold:
@@ -94,7 +97,7 @@ def main():
                 print("handle++++++++++++++++++++++")
                 drone.send_rc_control(0, 0, 0, 0)
                 continue
-            print("path_flag))))))))) ",path_flag)
+            print("\n\npath_flag)))))))))))))))))))))))))))))))))))))))))))))) ",path_flag)
             print("\n\nflag===========================", flag,'\n\n')
             print("doll++++++++++++++",doll)
             print("path:",path)
@@ -137,7 +140,7 @@ def main():
                     # TODO: detect different different id
                     if id == 1 and (flag == 1 or flag == 0):
                             
-                        z_update = tvec[i, 0, 2] - 60
+                        z_update = tvec[i, 0, 2] - 70
                         y_update = -(tvec[i, 0, 1] + 20)
                         x_update = tvec[i, 0, 0]
                         z_update = z_pid.update(z_update, sleep=0)
@@ -189,14 +192,14 @@ def main():
 
                             drone.send_rc_control(0, 0,0, 0)
                             time.sleep(0.5)
-                            drone.rotate_clockwise(90)
+                            drone.rotate_clockwise(85)
                             time.sleep(0.5)
                             drone.send_rc_control(0,0,0,0)
                             time.sleep(0.5)
                             drone.send_rc_control(0,-25,0,0)
                             time.sleep(2)
                             drone.send_rc_control(30,0,0,0)
-                            time.sleep(2)
+                            time.sleep(3)
                             drone.send_rc_control(0,0,0,0)
                             time.sleep(0.5)
                             # drone.move_back(100)
@@ -236,9 +239,7 @@ def main():
                             yaw_update = int(mss(yaw_update))
                             drone.send_rc_control(x_update, z_update, y_update, yaw_update)
                     else:
-                        if flag == 4: # if not detect aruco-id-3, then turn left
-                            drone.send_rc_control(0, 0, 0, -10)
-                        elif flag == 2:
+                        if flag == 2:
                             frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
                             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
                             
@@ -254,6 +255,10 @@ def main():
 
                             _, frame = cv2.threshold(gray, 50, 255, cv2.THRESH_BINARY)
 
+                            if path == 1 and path_flag == 7:
+                                black = lab11info.line_follower(frame ,h, w, 0.3)
+                            elif path == 2 and path_flag == 3:
+                                black = lab11info.line_follower(frame ,h, w, 0.3)
                             black = lab11info.line_follower(frame, h, w)
 
                             speed = 10
@@ -294,14 +299,14 @@ def main():
                                     time.sleep(0.5)
                                     path_flag += 1
 
-                                elif path_flag == 4 and (black in corner_ulr or black in horizontal):
+                                elif path_flag == 4 and (black in corner_ulr or black in horizontal or black in corner_cana1):
                                     drone.send_rc_control(0, 0, 0, 0)
                                     time.sleep(1)
                                     drone.send_rc_control(-speed, 0, 0, 0)
                                     time.sleep(0.5)
                                     path_flag += 1
 
-                                elif path_flag == 5 and (black in corner_dr or black in vertical):
+                                elif path_flag == 5 and (black in corner_dr or black in vertical or black in corner_cana1):
                                     drone.send_rc_control(0, 0, 0, 0)
                                     time.sleep(1)
                                     drone.send_rc_control(0, 0, -y_speed, 0)
@@ -338,7 +343,7 @@ def main():
                                         drone.send_rc_control(0, 0, -y_speed, 0)
                                     elif path_flag == 7:    #left (under table)
                                         drone.send_rc_control(-speed, 0, 0, 0)
-                                        time.sleep(2)
+                                        # time.sleep(2)
                                     else:
                                         if black == [[0, 0, 0],
                                                     [0, 0, 0], 
@@ -355,11 +360,11 @@ def main():
                                     time.sleep(0.5)
                                     path_flag += 1
 
-                                elif path_flag == 1 and (black in corner_dr):
+                                elif path_flag == 1 and (black in corner_dr or black in corner_cana1):
                                     drone.send_rc_control(0, 0, 0, 0)
                                     time.sleep(1)
-                                    drone.send_rc_control(speed, 0, 0, 0)
-                                    time.sleep(0.5)
+                                    # drone.send_rc_control(speed, 0, 0, 0)
+                                    # time.sleep(0.5)
                                     drone.send_rc_control(0, 0, -y_speed, 0)
                                     time.sleep(0.5)
                                     path_flag += 1
@@ -374,7 +379,7 @@ def main():
                                 elif path_flag == 3 and (black in corner_ur or black in vertical):
                                     drone.send_rc_control(0, 0, 0, 0)
                                     time.sleep(1)
-                                    drone.send_rc_control(speed, 0, 0, 0)
+                                    drone.send_rc_control(-speed, 0, 0, 0)
                                     time.sleep(0.5)
                                     drone.send_rc_control(0, 0, y_speed, 0)
                                     time.sleep(0.5)
@@ -424,7 +429,7 @@ def main():
                                         drone.send_rc_control(0, 0, -y_speed, 0)
                                     elif path_flag == 3:    #left (under table)
                                         drone.send_rc_control(-speed, 0, 0, 0)
-                                        time.sleep(2)
+                                        # time.sleep(2)
                                     else:
                                         if black == [[0, 0, 0],
                                                     [0, 0, 0], 
@@ -450,9 +455,14 @@ def main():
 
                     _, frame = cv2.threshold(gray, 50, 255, cv2.THRESH_BINARY)
 
+                    if path == 1 and path_flag == 7:
+                        black = lab11info.line_follower(frame ,h, w, 0.3)
+                    elif path == 2 and path_flag == 3:
+                        black = lab11info.line_follower(frame ,h, w, 0.3)
                     black = lab11info.line_follower(frame, h, w)
 
                     speed = 10
+                    y_speed = 25
                     # print(black, '\n')
                     if black == [[1, 1, 1],
                                 [1, 1, 1], 
@@ -489,14 +499,16 @@ def main():
                             time.sleep(0.5)
                             path_flag += 1
 
-                        elif path_flag == 4 and (black in corner_ulr or black in horizontal):
+                        elif path_flag == 4 and (black in corner_ulr or black in horizontal or black in corner_cana1):
                             drone.send_rc_control(0, 0, 0, 0)
                             time.sleep(1)
+                            drone.send_rc_control(0, 0, -5, 0)
+                            time.sleep(0.2)
                             drone.send_rc_control(-speed, 0, 0, 0)
                             time.sleep(0.5)
                             path_flag += 1
 
-                        elif path_flag == 5 and (black in corner_dr or black in vertical):
+                        elif path_flag == 5 and (black in corner_dr or black in vertical or black in corner_cana1):
                             drone.send_rc_control(0, 0, 0, 0)
                             time.sleep(1)
                             drone.send_rc_control(0, 0, -y_speed, 0)
@@ -513,11 +525,13 @@ def main():
                         elif path_flag == 7 and (black in corner_ur or black in vertical):
                             drone.send_rc_control(0, 0, 0, 0)
                             time.sleep(1)
+                            drone.send_rc_control(speed, 0, 0, 0)
+                            time.sleep(0.5)
                             drone.send_rc_control(0, 0, y_speed, 0)
                             time.sleep(0.5)
                             path_flag += 1
 
-                        elif path_flag == 8 and (black in corner_dl or black in horizontal):
+                        elif path_flag == 8 and (black in corner_dl or black in horizontal or black in corner_cana2):
                             drone.send_rc_control(0, 0, 0, 0)
                             time.sleep(1)
                             drone.send_rc_control(-speed, 0, 0, 0)
@@ -550,11 +564,11 @@ def main():
                             time.sleep(0.5)
                             path_flag += 1
 
-                        elif path_flag == 1 and (black in corner_dr):
+                        elif path_flag == 1 and (black in corner_dr or black in corner_cana1):
                             drone.send_rc_control(0, 0, 0, 0)
                             time.sleep(1)
-                            drone.send_rc_control(speed, 0, 0, 0)
-                            time.sleep(0.5)
+                            # drone.send_rc_control(speed, 0, 0, 0)
+                            # time.sleep(0.5)
                             drone.send_rc_control(0, 0, -y_speed, 0)
                             time.sleep(0.5)
                             path_flag += 1
@@ -569,20 +583,20 @@ def main():
                         elif path_flag == 3 and (black in corner_ur or black in vertical):
                             drone.send_rc_control(0, 0, 0, 0)
                             time.sleep(1)
-                            drone.send_rc_control(speed, 0, 0, 0)
+                            drone.send_rc_control(-speed, 0, 0, 0)
                             time.sleep(0.5)
                             drone.send_rc_control(0, 0, y_speed, 0)
                             time.sleep(0.5)
                             path_flag += 1
 
-                        elif path_flag == 4 and (black in corner_dl or black in horizontal):
+                        elif path_flag == 4 and (black in corner_dl or black in horizontal or black in corner_cana2):
                             drone.send_rc_control(0, 0, 0, 0)
                             time.sleep(1)
                             drone.send_rc_control(-speed, 0, 0, 0)
                             time.sleep(0.5)
                             path_flag += 5
 
-                        elif path_flag == 5 and (black in corner_ulr or black in vertical):
+                        elif path_flag == 5 and (black in corner_ulr or black in vertical or black in corner_cana2):
                             drone.send_rc_control(0, 0, 0, 0)
                             time.sleep(1)
                             drone.send_rc_control(0, 0, y_speed, 0)
@@ -635,6 +649,7 @@ def main():
                         retval, rvec, tvec = cv2.solvePnP(face_objectPoints, np.array([[x,y],[x+w,y],[x,y+h],[x+w,y+h]], dtype=np.float32), intrinsic, distortion)
                         if not retval:
                             continue
+                        print(tvec)
 
                         faces_x.append(tvec)
                         face2_num += 1
@@ -644,14 +659,14 @@ def main():
                         # cv2.putText(frame, z_text, (x, y+h+60), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 1, cv2.LINE_AA)
                     
                     if face2_num == 1 and face_flag == 0:
-                        z_update = tvec[i, 0, 2] - 150 # land region is 150 cm away from aruco-3
-                        y_update = -(tvec[i, 0, 1] + 20)
-                        x_update = tvec[i, 0, 0]
+                        z_update = tvec[2, 0] - 150 # land region is 150 cm away from aruco-3
+                        y_update = -(tvec[1, 0] + 20)
+                        x_update = tvec[0, 0]
                         z_update = z_pid.update(z_update, sleep=0)
                         y_update = y_pid.update(y_update, sleep=0)
                         x_update = x_pid.update(x_update, sleep=0)
 
-                        R, _ = cv2.Rodrigues(rvec[i])
+                        R, _ = cv2.Rodrigues(rvec)
                         V = np.matmul(R, [0, 0, 1])
                         rad = math.atan(V[0]/V[2])
                         deg = rad / math.pi * 180
@@ -667,9 +682,10 @@ def main():
                             yaw_update = int(mss(yaw_update))
                             drone.send_rc_control(x_update, z_update, y_update, yaw_update)
                     elif face2_num == 1 and face_flag == 1:
-                        drone.send_rc_control(10,0,0,0)
+                        drone.send_rc_control(3,0,0,0)
                     
                     elif face2_num == 2: 
+                        drone.send_rc_control(0, 0, 0, 0)
 
                         middle = int((faces_x[0][0]+ faces_x[1][0]) / 2)
                         x_update = abs(middle+15)
@@ -682,24 +698,28 @@ def main():
                             flag = 4
                             drone.send_rc_control(0,0,0,0)
                             time.sleep(0.5)
+                            # drone.move_forward(200)
                             drone.send_rc_control(0, 50, 0, 0)
                             time.sleep(4)
-                            drone.rotate_clockwise(180)
+                            drone.rotate_counter_clockwise(180)
+                            time.sleep(2)
+                            # drone.rotate_counter_clockwise(90)
+                            # time.sleep(1)
 
                         else:
                             z_update = 0
                             y_update = 0
-                            x_update = int(mss(x_update))
+                            x_update = int(mss(x_update)) if int(mss(x_update)) <= 5 else 5
                             yaw_update = 0
                             drone.send_rc_control(x_update, z_update, y_update, yaw_update)
-                        break
+                        
                     else:
                         if face2_num > 2:
                             drone.send_rc_control(0, 0, 0, 0)  
                         else:
-                            drone.send_rc_control(10,0,0,0)
+                            drone.send_rc_control(5,0,0,0)
                 elif flag == 4:
-                    drone.send_rc_control(0, 0,0,0)
+                    drone.send_rc_control(5, 0,0,0)
                 else:
                     drone.send_rc_control(0, 0,0,0)
             
